@@ -35,12 +35,10 @@
           },
           "configurations": {
             "production": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ],
+              "fileReplacements": [{
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.prod.ts"
+              }],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -129,5 +127,43 @@
       }
     }
   },
-  "defaultProject": "stottle-auth0-ngrx"
+  "defaultProject": "stottle-auth0-ngrx",
+  "schematics": {
+    "@ngrx/schematics:module": {
+      "flat": false,
+      "spec": false,
+      "project": "stottle-auth0-ngrx"
+    },
+    "@ngrx/schematics:component": {
+      "prefix": "stottle",
+      "styleext": "scss",
+      "inlineStyle": true,
+      "inlineTemplate": true,
+      "flat": true,
+      "spec": false,
+      "project": "stottle-auth0-ngrx"
+    },
+    "@ngrx/schematics:container": {
+      "prefix": "stottle",
+      "styleext": "scss",
+      "inlineStyle": true,
+      "inlineTemplate": true,
+      "flat": true,
+      "project": "stottle-auth0-ngrx"
+    },
+    "@ngrx/schematics:service": {
+      "flat": true,
+      "project": "stottle-auth0-ngrx"
+    },
+    "@ngrx/schematics:directive": {
+      "prefix": "stottle",
+      "project": "stottle-auth0-ngrx"
+    },
+    "@ngrx/schematics:pipe": {
+      "project": "stottle-auth0-ngrx"
+    }
+  },
+  "cli": {
+    "defaultCollection": "@ngrx/schematics"
+  }
 }
