@@ -1,8 +1,8 @@
-import { Component, OnInit } from "@angular/core";
-import { AuthProviderService } from "../../../auth/services/auth-provider.service";
+import { Component } from '@angular/core';
+import { AuthProviderService } from '../../auth/services/auth-provider.service';
 
 @Component({
-  selector: "stottle-home",
+  selector: 'stottle-home',
   template: `
   <button type="button" (click)="login()">login</button>
   `,

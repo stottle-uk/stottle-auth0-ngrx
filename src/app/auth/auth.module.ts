@@ -1,17 +1,17 @@
-import { NgModule } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import * as auth0 from "auth0-js";
-import { AUTH0_WEB_AUTH } from "./services/tokens";
-import { RouterModule } from "@angular/router";
-import { CallbackComponent } from "./components/callback/callback.component";
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import * as auth0 from 'auth0-js';
+import { CallbackComponent } from './components/callback.component';
+import { AUTH0_WEB_AUTH } from './services/tokens';
 
 export function auth0WebAuthFactory(): auth0.WebAuth {
   return new auth0.WebAuth({
-    clientID: "gc3YpcUt64cC655TKbfiv9Pimon2c9V2",
-    domain: "stottle.eu.auth0.com",
-    responseType: "token id_token",
-    redirectUri: "http://localhost:4200/callback",
-    scope: "openid"
+    clientID: 'gc3YpcUt64cC655TKbfiv9Pimon2c9V2',
+    domain: 'stottle.eu.auth0.com',
+    responseType: 'token id_token',
+    redirectUri: 'http://localhost:4200/callback',
+    scope: 'openid'
   });
 }
 
