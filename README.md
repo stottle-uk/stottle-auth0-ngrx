@@ -2,7 +2,7 @@
 
 Auth0 WebAuth with NGRX
 
-As an anonymous user I want to login so that i can use the applications features
+As an anonymous user I want to see the login form when i click on a link that requires authentication
 Given i am an anonymous user
 When I click on a link that requires authentication
 Then the login form is displayed
