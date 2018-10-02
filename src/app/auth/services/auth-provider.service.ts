@@ -1,7 +1,7 @@
-import { Injectable, Inject } from "@angular/core";
-import { AUTH0_WEB_AUTH } from "./tokens";
+import { Inject, Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import * as auth0 from "auth0-js";
+import { AUTH0_WEB_AUTH } from "./tokens";
 
 @Injectable()
 export class AuthProviderService {
