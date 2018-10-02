@@ -48,4 +48,11 @@ export class AuthProviderService {
     const expiresAt = JSON.parse(localStorage.getItem('expires_at') || '{}');
     return new Date().getTime() < expiresAt;
   }
+
+  public getAuthState(): Auth {
+    return {
+      expiresAt: JSON.parse(localStorage.getItem('expires_at') || '{}'),
+      accessToken: localStorage.getItem('access_token')
+    };
+  }
 }
