@@ -1,5 +1,9 @@
 import { Component } from "@angular/core";
+import { Store } from "@ngrx/store";
 import { AuthProviderService } from "./auth/services/auth-provider.service";
+import * as fromAuth from "./auth/store";
+import { map } from "rxjs/operators";
+import { Auth } from "./auth/store/auth.model";
 
 @Component({
   selector: "stottle-root",
@@ -29,9 +33,16 @@ import { AuthProviderService } from "./auth/services/auth-provider.service";
 export class AppComponent {
   title = "stottle-auth0-ngrx";
 
-  constructor(public auth: AuthProviderService) {}
+  constructor(
+    public auth: AuthProviderService,
+    private store: Store<fromAuth.State>
+  ) {}
 
   ngOnInit() {
-    this.auth.handleAuthentication();
+    this.auth
+      .handleAuthentication()
+      .subscribe(auth =>
+        this.store.dispatch(new fromAuth.HandleAuthentication({ auth }))
+      );
   }
 }
