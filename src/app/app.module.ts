@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
+import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { AppComponent } from './app.component';
@@ -36,6 +37,7 @@ export const ROUTES: Routes = [
         // }
       }
     ),
+    EffectsModule.forRoot([]),
     StoreDevtoolsModule.instrument({ name: 'ngrx-auth0-example' }),
     RouterClientModule,
     RouterModule.forRoot(ROUTES),

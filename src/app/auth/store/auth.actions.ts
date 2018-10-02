@@ -1,8 +1,9 @@
-import { Action } from "@ngrx/store";
-import { Auth } from "./auth.model";
+import { Action } from '@ngrx/store';
+import { Auth } from './auth.model';
 
 export enum AuthActionTypes {
-  HandleAuthentication = "[Auth] Handle Authentication"
+  HandleAuthentication = '[Auth] Handle Authentication',
+  HandleAuthenticationError = '[Auth] Handle Authentication Error'
 }
 
 export class HandleAuthentication implements Action {
@@ -11,4 +12,10 @@ export class HandleAuthentication implements Action {
   constructor(public payload: { auth: Auth }) {}
 }
 
-export type AuthActions = HandleAuthentication;
+export class HandleAuthenticationError implements Action {
+  readonly type = AuthActionTypes.HandleAuthenticationError;
+
+  constructor(public payload: { error: auth0.Auth0Error }) {}
+}
+
+export type AuthActions = HandleAuthentication | HandleAuthenticationError;

@@ -1,10 +1,14 @@
-import { AuthActions, AuthActionTypes } from "./auth.actions";
-import { Auth } from "./auth.model";
+import { AuthActions, AuthActionTypes } from './auth.actions';
+import { Auth } from './auth.model';
 
-export interface State extends Auth {}
+export interface State {
+  auth: Auth;
+  error: auth0.Auth0Error;
+}
 
 export const initialState: State = {
-  expiresAt: null
+  auth: null,
+  error: null
 };
 
 export function reducer(state = initialState, action: AuthActions): State {
@@ -12,7 +16,15 @@ export function reducer(state = initialState, action: AuthActions): State {
     case AuthActionTypes.HandleAuthentication: {
       return {
         ...state,
-        ...action.payload.auth
+        error: null,
+        auth: action.payload.auth
+      };
+    }
+
+    case AuthActionTypes.HandleAuthenticationError: {
+      return {
+        ...state,
+        error: action.payload.error
       };
     }
 
