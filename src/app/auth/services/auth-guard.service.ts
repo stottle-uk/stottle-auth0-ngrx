@@ -12,12 +12,19 @@ export class AuthGuardService implements CanActivate {
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
     return this.store
       .select(fromAuth.selectIsAuthenticated(new Date().getTime()))
-      .pipe(tap(isAuthenticated => this.showLoginFormIfNotAuthenticated(isAuthenticated)));
+      .pipe(tap(isAuthenticated => this.showLoginFormIfNotAuthenticated(isAuthenticated, state)));
   }
 
-  private showLoginFormIfNotAuthenticated(isAuthenticated: boolean) {
+  private showLoginFormIfNotAuthenticated(isAuthenticated: boolean, state: RouterStateSnapshot) {
     if (!isAuthenticated) {
-      this.store.dispatch(new fromAuth.Login());
+      this.store.dispatch(
+        new fromAuth.Login({
+          redirectUrl: state.url,
+          options: {
+            mode: 'signUp'
+          }
+        })
+      );
     }
   }
 }

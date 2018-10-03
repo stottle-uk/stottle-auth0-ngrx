@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
-import { catchError, exhaustMap, map, take } from 'rxjs/operators';
+import { catchError, exhaustMap, map, take, tap } from 'rxjs/operators';
 import * as fromRouter from '../../router-client/store';
 import { AuthProviderService } from '../services/auth-provider.service';
 import * as fromActions from './auth.actions';
@@ -34,14 +34,22 @@ export class AuthEffects {
           ? new fromActions.HandleAuthentication({
               auth: authState
             })
-          : new fromActions.Logout()
+          : new fromActions.ClearLocalStorage()
     )
   );
 
   @Effect({ dispatch: false })
   login$ = this.actions$.pipe(
     ofType<fromActions.Login>(fromActions.AuthActionTypes.Login),
-    map(() => this.auth.login())
+    map(action => action.payload.options),
+    map(options => this.auth.login(options))
+  );
+
+  @Effect({ dispatch: false })
+  loginSaveRedirectUrl$ = this.actions$.pipe(
+    ofType<fromActions.Login>(fromActions.AuthActionTypes.Login),
+    map(action => action.payload.redirectUrl),
+    tap(redirectUrl => (this.auth.redirectUrl = redirectUrl))
   );
 
   @Effect()
@@ -54,6 +62,12 @@ export class AuthEffects {
           path: ['/']
         })
     )
+  );
+
+  @Effect()
+  logoutClearLocalStorage$ = this.actions$.pipe(
+    ofType<fromActions.Logout>(fromActions.AuthActionTypes.Logout),
+    map(() => new fromActions.ClearLocalStorage())
   );
 
   @Effect()
@@ -75,11 +89,18 @@ export class AuthEffects {
   @Effect()
   handleAuthenticationRedirectUser$ = this.actions$.pipe(
     ofType<fromActions.HandleAuthentication>(fromActions.AuthActionTypes.HandleAuthentication),
+    map(action => action.payload.auth),
     map(
-      () =>
+      auth =>
         new fromRouter.Go({
-          path: ['/']
+          path: [auth.redirectUrl]
         })
     )
+  );
+
+  @Effect({ dispatch: false })
+  clearLocalStorage$ = this.actions$.pipe(
+    ofType<fromActions.ClearLocalStorage>(fromActions.AuthActionTypes.ClearLocalStorage),
+    map(() => this.auth.logout())
   );
 }

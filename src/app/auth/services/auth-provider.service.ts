@@ -6,24 +6,60 @@ import { AUTH0_WEB_AUTH } from './tokens';
 
 @Injectable()
 export class AuthProviderService {
-  constructor(@Inject(AUTH0_WEB_AUTH) private auth0: auth0.WebAuth) {}
+  ACCESS_TOKEN = 'access_token';
+  ID_TOKEN = 'id_token';
+  EXPIRES_AT = 'expires_at';
+  REDIRECT_URL = 'redirect_url';
 
-  public login(): void {
-    this.auth0.authorize();
+  get accessToken(): string {
+    return localStorage.getItem(this.ACCESS_TOKEN);
   }
 
-  public handleAuthentication(): Observable<Auth> {
+  set accessToken(accessToken: string) {
+    this.addorRemoveFromLocalStorage(this.ACCESS_TOKEN, accessToken);
+  }
+
+  get idToken(): string {
+    return localStorage.getItem(this.ID_TOKEN);
+  }
+
+  set idToken(idToken: string) {
+    this.addorRemoveFromLocalStorage(this.ID_TOKEN, idToken);
+  }
+
+  get expiresAt(): string {
+    return localStorage.getItem(this.EXPIRES_AT);
+  }
+
+  set expiresAt(expiresAt: string) {
+    this.addorRemoveFromLocalStorage(this.EXPIRES_AT, expiresAt);
+  }
+
+  get redirectUrl(): string {
+    return localStorage.getItem(this.REDIRECT_URL);
+  }
+
+  set redirectUrl(url: string) {
+    this.addorRemoveFromLocalStorage(this.REDIRECT_URL, url);
+  }
+
+  constructor(@Inject(AUTH0_WEB_AUTH) private auth0: auth0.WebAuth) {}
+
+  login(options: auth0.AuthorizeOptions): void {
+    this.auth0.authorize(options);
+  }
+
+  handleAuthentication(): Observable<Auth> {
     return new Observable<Auth>(observer => {
       this.auth0.parseHash((err, authResult) => {
         if (authResult && authResult.accessToken && authResult.idToken) {
-          const authResultWithExpiresAt = {
+          const clientAuthResult: Auth = {
             ...authResult,
-            expiresAt: JSON.stringify(
-              authResult.expiresIn * 1000 + new Date().getTime()
-            )
+            expiresAt: JSON.stringify(authResult.expiresIn * 1000 + new Date().getTime()),
+            redirectUrl: this.redirectUrl
           };
-          this.setSession(authResultWithExpiresAt);
-          observer.next(authResultWithExpiresAt);
+          this.setSession(clientAuthResult);
+          observer.next(clientAuthResult);
           observer.complete();
         } else if (err) {
           observer.error(err);
@@ -32,27 +68,31 @@ export class AuthProviderService {
     });
   }
 
-  private setSession(authResult: Auth): void {
-    localStorage.setItem('access_token', authResult.accessToken);
-    localStorage.setItem('id_token', authResult.idToken);
-    localStorage.setItem('expires_at', authResult.expiresAt);
+  logout(): void {
+    this.accessToken = null;
+    this.idToken = null;
+    this.expiresAt = null;
   }
 
-  public logout(): void {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('id_token');
-    localStorage.removeItem('expires_at');
-  }
-
-  public isAuthenticated(): boolean {
-    const expiresAt = JSON.parse(localStorage.getItem('expires_at') || '{}');
-    return new Date().getTime() < expiresAt;
-  }
-
-  public getAuthState(): Auth {
+  getAuthState(): Auth {
     return {
-      expiresAt: JSON.parse(localStorage.getItem('expires_at') || '{}'),
-      accessToken: localStorage.getItem('access_token')
+      expiresAt: JSON.parse(this.expiresAt || '{}'),
+      accessToken: this.accessToken,
+      redirectUrl: this.redirectUrl
     };
+  }
+
+  private setSession(authResult: Auth): void {
+    this.accessToken = authResult.accessToken;
+    this.idToken = authResult.idToken;
+    this.expiresAt = authResult.expiresAt;
+  }
+
+  private addorRemoveFromLocalStorage(item: string, value: string) {
+    if (value) {
+      localStorage.setItem(item, value);
+    } else {
+      localStorage.removeItem(item);
+    }
   }
 }

@@ -25,7 +25,14 @@ export class AppComponent {
   constructor(private store: Store<fromAuth.State>) {}
 
   login(): void {
-    this.store.dispatch(new fromAuth.Login());
+    this.store.dispatch(
+      new fromAuth.Login({
+        redirectUrl: '/',
+        options: {
+          mode: 'login'
+        }
+      })
+    );
   }
 
   logout(): void {
