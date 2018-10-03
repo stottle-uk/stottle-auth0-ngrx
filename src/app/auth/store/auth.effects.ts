@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
-import { catchError, exhaustMap, first, map } from 'rxjs/operators';
+import { catchError, exhaustMap, filter, map, take } from 'rxjs/operators';
 import { AuthProviderService } from '../services/auth-provider.service';
 import * as fromActions from './auth.actions';
 import { State } from './auth.reducer';
@@ -17,18 +17,17 @@ export class AuthEffects {
 
   @Effect()
   setupAuthentication$ = this.actions$.pipe(
-    first(),
+    take(1),
     map(() => new fromActions.SetupAuthentication())
   );
 
   @Effect()
   setupAuthenticationIsAuthenticated$ = this.actions$.pipe(
-    ofType<fromActions.SetupAuthentication>(
-      fromActions.AuthActionTypes.SetupAuthentication
-    ),
+    ofType<fromActions.SetupAuthentication>(fromActions.AuthActionTypes.SetupAuthentication),
     map(() => this.auth.getAuthState()),
-    first(authState => !!authState.accessToken && !!authState.expiresAt),
-    first(authState => new Date().getTime() < +authState.expiresAt),
+    filter(authState => !!authState.accessToken && !!authState.expiresAt),
+    filter(authState => new Date().getTime() < +authState.expiresAt),
+    take(1),
     map(
       auth =>
         new fromActions.HandleAuthentication({
@@ -37,9 +36,21 @@ export class AuthEffects {
     )
   );
 
+  @Effect({ dispatch: false })
+  login$ = this.actions$.pipe(
+    ofType<fromActions.Login>(fromActions.AuthActionTypes.Login),
+    map(() => this.auth.login())
+  );
+
+  @Effect({ dispatch: false })
+  logout$ = this.actions$.pipe(
+    ofType<fromActions.Logout>(fromActions.AuthActionTypes.Logout),
+    map(() => this.auth.logout())
+  );
+
   @Effect()
   handleAuthentication$ = this.actions$.pipe(
-    first(),
+    take(1),
     exhaustMap(() =>
       this.auth.handleAuthentication().pipe(
         map(
@@ -48,9 +59,7 @@ export class AuthEffects {
               auth
             })
         ),
-        catchError(error =>
-          of(new fromActions.HandleAuthenticationError({ error }))
-        )
+        catchError(error => of(new fromActions.HandleAuthenticationError({ error })))
       )
     )
   );

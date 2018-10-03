@@ -21,22 +21,7 @@ export const ROUTES: Routes = [
   declarations: [AppComponent, HomeComponent],
   imports: [
     BrowserModule,
-    StoreModule.forRoot(
-      {},
-      {
-        // metaReducers: metaReducers,
-        // initialState: {
-        //   router: {
-        //     state: {
-        //       url: '/',
-        //       params: {},
-        //       queryParams: {}
-        //     },
-        //     navigationId: 0
-        //   }
-        // }
-      }
-    ),
+    StoreModule.forRoot({}),
     EffectsModule.forRoot([]),
     StoreDevtoolsModule.instrument({ name: 'ngrx-auth0-example' }),
     RouterClientModule,

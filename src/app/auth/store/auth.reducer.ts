@@ -13,6 +13,10 @@ export const initialState: State = {
 
 export function reducer(state = initialState, action: AuthActions): State {
   switch (action.type) {
+    case AuthActionTypes.Logout: {
+      return initialState;
+    }
+
     case AuthActionTypes.HandleAuthentication: {
       return {
         ...state,

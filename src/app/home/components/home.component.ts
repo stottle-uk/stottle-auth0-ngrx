@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { AuthProviderService } from '../../auth/services/auth-provider.service';
+import { Store } from '@ngrx/store';
+import * as fromAuth from '../../auth/store';
 
 @Component({
   selector: 'stottle-home',
@@ -9,9 +10,13 @@ import { AuthProviderService } from '../../auth/services/auth-provider.service';
   styles: []
 })
 export class HomeComponent {
-  constructor(private auth: AuthProviderService) {}
+  constructor(private store: Store<fromAuth.State>) {}
 
   login(): void {
-    this.auth.login();
+    this.store.dispatch(new fromAuth.Login());
+  }
+
+  logout(): void {
+    this.store.dispatch(new fromAuth.Logout());
   }
 }
