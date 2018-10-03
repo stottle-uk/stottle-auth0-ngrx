@@ -55,7 +55,6 @@ export class AuthEffects {
   @Effect()
   logout$ = this.actions$.pipe(
     ofType<fromActions.Logout>(fromActions.AuthActionTypes.Logout),
-    map(() => this.auth.clearLocalStorage()),
     map(
       () =>
         new fromRouter.Go({
