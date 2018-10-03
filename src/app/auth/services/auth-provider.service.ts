@@ -16,7 +16,7 @@ export class AuthProviderService {
   }
 
   set accessToken(accessToken: string) {
-    this.addorRemoveFromLocalStorage(this.ACCESS_TOKEN, accessToken);
+    this.addOrRemoveFromLocalStorage(this.ACCESS_TOKEN, accessToken);
   }
 
   get idToken(): string {
@@ -24,7 +24,7 @@ export class AuthProviderService {
   }
 
   set idToken(idToken: string) {
-    this.addorRemoveFromLocalStorage(this.ID_TOKEN, idToken);
+    this.addOrRemoveFromLocalStorage(this.ID_TOKEN, idToken);
   }
 
   get expiresAt(): string {
@@ -32,7 +32,7 @@ export class AuthProviderService {
   }
 
   set expiresAt(expiresAt: string) {
-    this.addorRemoveFromLocalStorage(this.EXPIRES_AT, expiresAt);
+    this.addOrRemoveFromLocalStorage(this.EXPIRES_AT, expiresAt);
   }
 
   get redirectUrl(): string {
@@ -40,7 +40,7 @@ export class AuthProviderService {
   }
 
   set redirectUrl(url: string) {
-    this.addorRemoveFromLocalStorage(this.REDIRECT_URL, url);
+    this.addOrRemoveFromLocalStorage(this.REDIRECT_URL, url);
   }
 
   constructor(@Inject(AUTH0_WEB_AUTH) private auth0: auth0.WebAuth) {}
@@ -68,7 +68,7 @@ export class AuthProviderService {
     });
   }
 
-  logout(): void {
+  clearLocalStorage(): void {
     this.accessToken = null;
     this.idToken = null;
     this.expiresAt = null;
@@ -88,11 +88,11 @@ export class AuthProviderService {
     this.expiresAt = authResult.expiresAt;
   }
 
-  private addorRemoveFromLocalStorage(item: string, value: string) {
+  private addOrRemoveFromLocalStorage(key: string, value: string) {
     if (value) {
-      localStorage.setItem(item, value);
+      localStorage.setItem(key, value);
     } else {
-      localStorage.removeItem(item);
+      localStorage.removeItem(key);
     }
   }
 }

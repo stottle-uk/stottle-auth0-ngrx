@@ -55,7 +55,7 @@ export class AuthEffects {
   @Effect()
   logout$ = this.actions$.pipe(
     ofType<fromActions.Logout>(fromActions.AuthActionTypes.Logout),
-    map(() => this.auth.logout()),
+    map(() => this.auth.clearLocalStorage()),
     map(
       () =>
         new fromRouter.Go({
@@ -101,6 +101,6 @@ export class AuthEffects {
   @Effect({ dispatch: false })
   clearLocalStorage$ = this.actions$.pipe(
     ofType<fromActions.ClearLocalStorage>(fromActions.AuthActionTypes.ClearLocalStorage),
-    map(() => this.auth.logout())
+    map(() => this.auth.clearLocalStorage())
   );
 }
