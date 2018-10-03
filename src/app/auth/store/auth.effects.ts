@@ -70,4 +70,15 @@ export class AuthEffects {
       )
     )
   );
+
+  @Effect()
+  handleAuthenticationRedirectUser$ = this.actions$.pipe(
+    ofType<fromActions.HandleAuthentication>(fromActions.AuthActionTypes.HandleAuthentication),
+    map(
+      () =>
+        new fromRouter.Go({
+          path: ['/']
+        })
+    )
+  );
 }
