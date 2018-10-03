@@ -13,6 +13,10 @@ export const routes: Routes = [
     component: HomeComponent
   },
   {
+    path: 'admin',
+    loadChildren: './admin/admin.module#AdminModule'
+  },
+  {
     path: '**',
     redirectTo: '/'
   }
