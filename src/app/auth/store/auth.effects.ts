@@ -3,6 +3,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
 import { catchError, exhaustMap, filter, map, take } from 'rxjs/operators';
+import * as fromRouter from '../../router-client/store';
 import { AuthProviderService } from '../services/auth-provider.service';
 import * as fromActions from './auth.actions';
 import { State } from './auth.reducer';
@@ -42,10 +43,16 @@ export class AuthEffects {
     map(() => this.auth.login())
   );
 
-  @Effect({ dispatch: false })
+  @Effect()
   logout$ = this.actions$.pipe(
     ofType<fromActions.Logout>(fromActions.AuthActionTypes.Logout),
-    map(() => this.auth.logout())
+    map(() => this.auth.logout()),
+    map(
+      () =>
+        new fromRouter.Go({
+          path: ['/']
+        })
+    )
   );
 
   @Effect()

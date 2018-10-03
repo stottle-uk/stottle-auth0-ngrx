@@ -4,7 +4,7 @@ import { Auth } from './auth.model';
 export enum AuthActionTypes {
   SetupAuthentication = '[Auth] Setup Authentication',
   Login = '[Auth] Login',
-  Logout = '[Auth] Login',
+  Logout = '[Auth] Logout',
   HandleAuthentication = '[Auth] Handle Authentication',
   HandleAuthenticationError = '[Auth] Handle Authentication Error'
 }

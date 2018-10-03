@@ -1,22 +1,10 @@
 import { Component } from '@angular/core';
-import { Store } from '@ngrx/store';
-import * as fromAuth from '../../auth/store';
 
 @Component({
   selector: 'stottle-home',
   template: `
-  <button type="button" (click)="login()">login</button>
+  <h2>This is the home component</h2>
   `,
   styles: []
 })
-export class HomeComponent {
-  constructor(private store: Store<fromAuth.State>) {}
-
-  login(): void {
-    this.store.dispatch(new fromAuth.Login());
-  }
-
-  logout(): void {
-    this.store.dispatch(new fromAuth.Logout());
-  }
-}
+export class HomeComponent {}

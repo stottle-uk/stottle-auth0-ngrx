@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import * as auth0 from 'auth0-js';
+import { AuthRoutesModule } from './auth-routes.moduls';
 import { CallbackComponent } from './components/callback.component';
 import { AUTH0_WEB_AUTH } from './services/tokens';
 import * as fromAuth from './store';
@@ -24,7 +24,7 @@ export function auth0WebAuthFactory(): auth0.WebAuth {
     CommonModule,
     StoreModule.forFeature('auth', fromAuth.reducer),
     EffectsModule.forFeature([AuthEffects]),
-    RouterModule.forChild([])
+    AuthRoutesModule
   ],
   declarations: [CallbackComponent],
   providers: [
