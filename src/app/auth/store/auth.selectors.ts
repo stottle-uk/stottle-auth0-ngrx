@@ -6,3 +6,9 @@ export const selectAuthState = createFeatureSelector<State>('auth');
 export const selectAuth = createSelector(selectAuthState, getAuth);
 
 export const selectError = createSelector(selectAuthState, getError);
+
+export const selectIsAuthenticated = (time: number) =>
+  createSelector(
+    selectAuth,
+    auth => auth && !!auth.accessToken && !!auth.expiresAt && time < +auth.expiresAt
+  );
