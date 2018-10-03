@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
-import { catchError, exhaustMap, filter, map, take } from 'rxjs/operators';
+import { catchError, exhaustMap, map, take } from 'rxjs/operators';
 import * as fromRouter from '../../router-client/store';
 import { AuthProviderService } from '../services/auth-provider.service';
 import * as fromActions from './auth.actions';
@@ -26,14 +26,15 @@ export class AuthEffects {
   setupAuthenticationIsAuthenticated$ = this.actions$.pipe(
     ofType<fromActions.SetupAuthentication>(fromActions.AuthActionTypes.SetupAuthentication),
     map(() => this.auth.getAuthState()),
-    filter(authState => !!authState.accessToken && !!authState.expiresAt),
-    filter(authState => new Date().getTime() < +authState.expiresAt),
-    take(1),
     map(
-      auth =>
-        new fromActions.HandleAuthentication({
-          auth
-        })
+      authState =>
+        !!authState.accessToken &&
+        !!authState.expiresAt &&
+        new Date().getTime() < +authState.expiresAt
+          ? new fromActions.HandleAuthentication({
+              auth: authState
+            })
+          : new fromActions.Logout()
     )
   );
 
