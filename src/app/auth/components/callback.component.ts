@@ -1,19 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'stottle-callback',
-  template: `
-    <p>
-      callback works!
-    </p>
-  `,
+  template: `<p>callback works!</p>`,
   styles: []
 })
-export class CallbackComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
-}
+export class CallbackComponent {}

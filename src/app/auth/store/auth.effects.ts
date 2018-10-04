@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
-import { catchError, exhaustMap, map, take, tap } from 'rxjs/operators';
+import { Action, Store } from '@ngrx/store';
+import { EMPTY, Observable, of } from 'rxjs';
+import { catchError, exhaustMap, map, switchMap, take, tap } from 'rxjs/operators';
 import * as fromRouter from '../../router-client/store';
 import { AuthProviderService } from '../services/auth-provider.service';
 import * as fromActions from './auth.actions';
@@ -17,13 +17,13 @@ export class AuthEffects {
   ) {}
 
   @Effect()
-  setupAuthentication$ = this.actions$.pipe(
+  setupAuthentication$: Observable<Action> = this.actions$.pipe(
     take(1),
     map(() => new fromActions.SetupAuthentication())
   );
 
   @Effect()
-  setupAuthenticationIsAuthenticated$ = this.actions$.pipe(
+  setupAuthenticationIsAuthenticated$: Observable<Action> = this.actions$.pipe(
     ofType<fromActions.SetupAuthentication>(fromActions.AuthActionTypes.SetupAuthentication),
     map(() => this.auth.getAuthState()),
     map(
@@ -39,21 +39,22 @@ export class AuthEffects {
   );
 
   @Effect({ dispatch: false })
-  login$ = this.actions$.pipe(
+  login$: Observable<void> = this.actions$.pipe(
     ofType<fromActions.Login>(fromActions.AuthActionTypes.Login),
     map(action => action.payload.options),
     map(options => this.auth.login(options))
   );
 
   @Effect({ dispatch: false })
-  loginSaveRedirectUrl$ = this.actions$.pipe(
+  loginSaveRedirectUrl$: Observable<void> = this.actions$.pipe(
     ofType<fromActions.Login>(fromActions.AuthActionTypes.Login),
     map(action => action.payload.redirectUrl),
-    tap(redirectUrl => (this.auth.redirectUrl = redirectUrl))
+    tap(redirectUrl => (this.auth.redirectUrl = redirectUrl)),
+    switchMap(() => EMPTY)
   );
 
   @Effect()
-  logout$ = this.actions$.pipe(
+  logout$: Observable<Action> = this.actions$.pipe(
     ofType<fromActions.Logout>(fromActions.AuthActionTypes.Logout),
     map(
       () =>
@@ -64,13 +65,13 @@ export class AuthEffects {
   );
 
   @Effect()
-  logoutClearLocalStorage$ = this.actions$.pipe(
+  logoutClearLocalStorage$: Observable<Action> = this.actions$.pipe(
     ofType<fromActions.Logout>(fromActions.AuthActionTypes.Logout),
     map(() => new fromActions.ClearLocalStorage())
   );
 
   @Effect()
-  handleAuthentication$ = this.actions$.pipe(
+  handleAuthentication$: Observable<Action> = this.actions$.pipe(
     take(1),
     exhaustMap(() =>
       this.auth.handleAuthentication().pipe(
@@ -86,7 +87,7 @@ export class AuthEffects {
   );
 
   @Effect()
-  handleAuthenticationRedirectUser$ = this.actions$.pipe(
+  handleAuthenticationRedirectUser$: Observable<Action> = this.actions$.pipe(
     ofType<fromActions.HandleAuthentication>(fromActions.AuthActionTypes.HandleAuthentication),
     map(action => action.payload.auth),
     map(
@@ -98,7 +99,7 @@ export class AuthEffects {
   );
 
   @Effect({ dispatch: false })
-  clearLocalStorage$ = this.actions$.pipe(
+  clearLocalStorage$: Observable<void> = this.actions$.pipe(
     ofType<fromActions.ClearLocalStorage>(fromActions.AuthActionTypes.ClearLocalStorage),
     map(() => this.auth.clearLocalStorage())
   );
