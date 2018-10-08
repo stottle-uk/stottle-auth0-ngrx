@@ -4,17 +4,13 @@ import { Store } from '@ngrx/store';
 @Component({
   selector: 'stottle-dashboard',
   template: `
-    <p>
-      dashboard works!
-    </p>
+  <stottle-dashboard-inner
+  ></stottle-dashboard-inner>
   `,
   styles: []
 })
 export class DashboardComponent implements OnInit {
+  constructor(private store: Store<any>) {}
 
-  constructor(private store: Store<any>) { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }
