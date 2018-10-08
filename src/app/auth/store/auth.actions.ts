@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { Auth } from './auth.model';
+import { Authentication } from './auth.model';
 
 export enum AuthActionTypes {
   SetupAuthentication = '[Auth] Setup Authentication',
@@ -31,7 +31,7 @@ export class ClearLocalStorage implements Action {
 export class HandleAuthentication implements Action {
   readonly type = AuthActionTypes.HandleAuthentication;
 
-  constructor(public payload: { auth: Auth }) {}
+  constructor(public payload: { auth: Authentication }) {}
 }
 
 export class HandleAuthenticationError implements Action {

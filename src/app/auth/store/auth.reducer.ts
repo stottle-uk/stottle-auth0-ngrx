@@ -1,8 +1,8 @@
 import { AuthActions, AuthActionTypes } from './auth.actions';
-import { Auth } from './auth.model';
+import { Authentication } from './auth.model';
 
 export interface State {
-  auth: Auth;
+  auth: Authentication;
   error: auth0.Auth0Error;
 }
 

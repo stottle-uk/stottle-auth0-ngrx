@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import * as auth0 from 'auth0-js';
 import { Observable } from 'rxjs';
-import { Auth } from '../store/auth.model';
+import { Authentication } from '../store/auth.model';
 import { AUTH0_WEB_AUTH } from './tokens';
 
 @Injectable()
@@ -49,11 +49,11 @@ export class AuthProviderService {
     this.auth0.authorize(options);
   }
 
-  handleAuthentication(): Observable<Auth> {
-    return new Observable<Auth>(observer => {
+  handleAuthentication(): Observable<Authentication> {
+    return new Observable<Authentication>(observer => {
       this.auth0.parseHash((err, authResult) => {
         if (authResult && authResult.accessToken && authResult.idToken) {
-          const clientAuthResult: Auth = {
+          const clientAuthResult: Authentication = {
             ...authResult,
             expiresAt: JSON.stringify(authResult.expiresIn * 1000 + new Date().getTime()),
             redirectUrl: this.redirectUrl
@@ -74,7 +74,7 @@ export class AuthProviderService {
     this.expiresAt = null;
   }
 
-  getAuthState(): Auth {
+  getAuthState(): Authentication {
     return {
       expiresAt: JSON.parse(this.expiresAt || '{}'),
       accessToken: this.accessToken,
@@ -82,7 +82,7 @@ export class AuthProviderService {
     };
   }
 
-  private setSession(authResult: Auth): void {
+  private setSession(authResult: Authentication): void {
     this.accessToken = authResult.accessToken;
     this.idToken = authResult.idToken;
     this.expiresAt = authResult.expiresAt;
