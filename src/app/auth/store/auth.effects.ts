@@ -53,15 +53,10 @@ export class AuthEffects {
     switchMap(() => EMPTY)
   );
 
-  @Effect()
-  logout$: Observable<Action> = this.actions$.pipe(
+  @Effect({ dispatch: false })
+  logout$: Observable<void> = this.actions$.pipe(
     ofType<fromActions.Logout>(fromActions.AuthActionTypes.Logout),
-    map(
-      () =>
-        new fromRouter.Go({
-          path: ['/']
-        })
-    )
+    map(() => this.auth.logout())
   );
 
   @Effect()
@@ -96,6 +91,40 @@ export class AuthEffects {
           path: [auth.redirectUrl]
         })
     )
+  );
+
+  @Effect()
+  handleAuthenticationScheduleRenewal$: Observable<Action> = this.actions$.pipe(
+    ofType<fromActions.HandleAuthentication>(fromActions.AuthActionTypes.HandleAuthentication),
+    map(() => new fromActions.ScheduleSessionRenewal())
+  );
+
+  @Effect()
+  renewSessionStart$: Observable<Action> = this.actions$.pipe(
+    ofType<fromActions.RenewSessionStart>(fromActions.AuthActionTypes.RenewSessionStart),
+    switchMap(() =>
+      this.auth.renewAuthentication().pipe(
+        map(() => new fromActions.RenewSessionSuccess()),
+        catchError(error => of(new fromActions.RenewSessionFailure({ error })))
+      )
+    )
+  );
+
+  @Effect()
+  scheduleSessionRenewal$: Observable<Action> = this.actions$.pipe(
+    ofType<fromActions.ScheduleSessionRenewal>(fromActions.AuthActionTypes.ScheduleSessionRenewal),
+    switchMap(() =>
+      this.auth.scheduleRenewal().pipe(
+        map(() => new fromActions.RenewSessionSuccess()),
+        catchError(error => of(new fromActions.RenewSessionFailure({ error })))
+      )
+    )
+  );
+
+  @Effect()
+  renewSessionSuccess$: Observable<Action> = this.actions$.pipe(
+    ofType<fromActions.RenewSessionSuccess>(fromActions.AuthActionTypes.RenewSessionSuccess),
+    map(() => new fromActions.ScheduleSessionRenewal())
   );
 
   @Effect({ dispatch: false })

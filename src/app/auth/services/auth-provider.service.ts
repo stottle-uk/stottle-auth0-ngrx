@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import * as auth0 from 'auth0-js';
-import { Observable } from 'rxjs';
+import { Observable, of, race, Subscriber, timer } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { Authentication } from '../store/auth.model';
 import { AUTH0_WEB_AUTH } from './tokens';
 
@@ -49,23 +50,23 @@ export class AuthProviderService {
     this.auth0.authorize(options);
   }
 
-  handleAuthentication(): Observable<Authentication> {
-    return new Observable<Authentication>(observer => {
-      this.auth0.parseHash((err, authResult) => {
-        if (authResult && authResult.accessToken && authResult.idToken) {
-          const clientAuthResult: Authentication = {
-            ...authResult,
-            expiresAt: JSON.stringify(authResult.expiresIn * 1000 + new Date().getTime()),
-            redirectUrl: this.redirectUrl
-          };
-          this.setSession(clientAuthResult);
-          observer.next(clientAuthResult);
-          observer.complete();
-        } else if (err) {
-          observer.error(err);
-        }
-      });
+  logout(options?: auth0.LogoutOptions): void {
+    this.auth0.logout({
+      ...options,
+      returnTo: 'http://localhost:4200'
     });
+  }
+
+  handleAuthentication(): Observable<Authentication> {
+    return new Observable<auth0.Auth0DecodedHash>(observer =>
+      this.auth0.parseHash(this.authorisationCallback(observer))
+    ).pipe(map(authResult => this.authorizationHandler(authResult)));
+  }
+
+  renewAuthentication(): Observable<Authentication> {
+    return new Observable<auth0.Auth0DecodedHash>(observer =>
+      this.auth0.checkSession({}, this.authorisationCallback(observer))
+    ).pipe(map(authResult => this.authorizationHandler(authResult)));
   }
 
   clearLocalStorage(): void {
@@ -80,6 +81,38 @@ export class AuthProviderService {
       accessToken: this.accessToken,
       redirectUrl: this.redirectUrl
     };
+  }
+
+  scheduleRenewal(): Observable<Authentication> {
+    const sessionTimer = timer(30 * 60000); // 30 minutes
+    const sessionExpiryTimer = of(this.expiresAt).pipe(
+      switchMap(expiresAt => timer(Math.max(1, +expiresAt - Date.now() - 1000)))
+    );
+
+    return race(sessionTimer, sessionExpiryTimer).pipe(switchMap(() => this.renewAuthentication()));
+  }
+
+  private authorisationCallback(
+    observer: Subscriber<auth0.Auth0DecodedHash>
+  ): auth0.Auth0Callback<auth0.Auth0DecodedHash> {
+    return (err, authResult: auth0.Auth0DecodedHash) => {
+      if (authResult && authResult.accessToken && authResult.idToken) {
+        observer.next(authResult);
+        observer.complete();
+      } else if (err) {
+        observer.error(err);
+      }
+    };
+  }
+
+  private authorizationHandler(authResult: auth0.Auth0DecodedHash): Authentication {
+    const clientAuthResult: Authentication = {
+      ...authResult,
+      expiresAt: JSON.stringify(new Date().getTime() + 15000), // JSON.stringify(authResult.expiresIn * 1000 + new Date().getTime()),
+      redirectUrl: this.redirectUrl
+    };
+    this.setSession(clientAuthResult);
+    return clientAuthResult;
   }
 
   private setSession(authResult: Authentication): void {

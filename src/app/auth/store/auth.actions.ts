@@ -7,7 +7,11 @@ export enum AuthActionTypes {
   Logout = '[Auth] Logout',
   ClearLocalStorage = '[Auth] Clear Local Storage',
   HandleAuthentication = '[Auth] Handle Authentication',
-  HandleAuthenticationError = '[Auth] Handle Authentication Error'
+  HandleAuthenticationError = '[Auth] Handle Authentication Error',
+  RenewSessionStart = '[Auth] Renew Session Start',
+  RenewSessionSuccess = '[Auth] Renew Session Success',
+  RenewSessionFailure = '[Auth] Renew Session Failure',
+  ScheduleSessionRenewal = '[Auth] Schedule Session Renewal'
 }
 
 export class SetupAuthentication implements Action {
@@ -40,10 +44,32 @@ export class HandleAuthenticationError implements Action {
   constructor(public payload: { error: auth0.Auth0Error }) {}
 }
 
+export class RenewSessionStart implements Action {
+  readonly type = AuthActionTypes.RenewSessionStart;
+}
+
+export class RenewSessionSuccess implements Action {
+  readonly type = AuthActionTypes.RenewSessionSuccess;
+}
+
+export class RenewSessionFailure implements Action {
+  readonly type = AuthActionTypes.RenewSessionFailure;
+
+  constructor(public payload: { error: any }) {}
+}
+
+export class ScheduleSessionRenewal implements Action {
+  readonly type = AuthActionTypes.ScheduleSessionRenewal;
+}
+
 export type AuthActions =
   | SetupAuthentication
   | Login
   | Logout
   | ClearLocalStorage
   | HandleAuthentication
-  | HandleAuthenticationError;
+  | HandleAuthenticationError
+  | RenewSessionStart
+  | RenewSessionSuccess
+  | RenewSessionFailure
+  | ScheduleSessionRenewal;
