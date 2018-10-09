@@ -14,13 +14,18 @@ import { RouterClientModule } from './router-client/router-client.module';
   declarations: [AppComponent, HomeComponent],
   imports: [
     BrowserModule,
-    AuthModule.forRoot({
-      clientID: 'gc3YpcUt64cC655TKbfiv9Pimon2c9V2',
-      domain: 'stottle.eu.auth0.com',
-      responseType: 'token id_token',
-      redirectUri: 'http://localhost:4200/callback',
-      scope: 'openid'
-    }),
+    AuthModule.forRoot(
+      {
+        clientID: 'gc3YpcUt64cC655TKbfiv9Pimon2c9V2',
+        domain: 'stottle.eu.auth0.com',
+        responseType: 'token id_token',
+        redirectUri: 'http://localhost:4200/callback',
+        scope: 'openid'
+      },
+      {
+        returnTo: 'http://localhost:4200'
+      }
+    ),
     RouterClientModule,
     StoreModule.forRoot({}),
     EffectsModule.forRoot([]),

@@ -7,7 +7,7 @@ import { AuthRoutesModule } from './auth-routes.moduls';
 import { CallbackComponent } from './components/callback.component';
 import { AuthGuardService } from './services/auth-guard.service';
 import { AuthProviderService } from './services/auth-provider.service';
-import { AUTH0_WEB_AUTH } from './services/tokens';
+import { AUTH0_LOGOUT_OPTIONS, AUTH0_WEB_AUTH } from './services/tokens';
 import * as fromAuth from './store';
 import { AuthEffects } from './store/auth.effects';
 
@@ -25,13 +25,20 @@ export function auth0WebAuthFactory(options: auth0.AuthOptions): () => auth0.Web
   declarations: [CallbackComponent]
 })
 export class AuthModule {
-  static forRoot(options: auth0.AuthOptions): ModuleWithProviders {
+  static forRoot(
+    options: auth0.AuthOptions,
+    logoutOptions: auth0.LogoutOptions
+  ): ModuleWithProviders {
     return {
       ngModule: AuthModule,
       providers: [
         {
           provide: AUTH0_WEB_AUTH,
           useFactory: auth0WebAuthFactory(options)
+        },
+        {
+          provide: AUTH0_LOGOUT_OPTIONS,
+          useValue: logoutOptions
         },
         AuthProviderService,
         AuthGuardService

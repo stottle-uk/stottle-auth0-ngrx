@@ -3,7 +3,7 @@ import * as auth0 from 'auth0-js';
 import { Observable, of, race, Subscriber, timer } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { Authentication } from '../store/auth.model';
-import { AUTH0_WEB_AUTH } from './tokens';
+import { AUTH0_LOGOUT_OPTIONS, AUTH0_WEB_AUTH } from './tokens';
 
 @Injectable()
 export class AuthProviderService {
@@ -44,7 +44,10 @@ export class AuthProviderService {
     this.addOrRemoveFromLocalStorage(this.REDIRECT_URL, url);
   }
 
-  constructor(@Inject(AUTH0_WEB_AUTH) private auth0: auth0.WebAuth) {}
+  constructor(
+    @Inject(AUTH0_WEB_AUTH) private auth0: auth0.WebAuth,
+    @Inject(AUTH0_LOGOUT_OPTIONS) private logoutOptions: auth0.LogoutOptions
+  ) {}
 
   login(options: auth0.AuthorizeOptions): void {
     this.auth0.authorize(options);
@@ -52,8 +55,8 @@ export class AuthProviderService {
 
   logout(options?: auth0.LogoutOptions): void {
     this.auth0.logout({
-      ...options,
-      returnTo: 'http://localhost:4200'
+      ...this.logoutOptions,
+      ...options
     });
   }
 
@@ -69,6 +72,15 @@ export class AuthProviderService {
     ).pipe(this.authorizationHandler());
   }
 
+  scheduleRenewal(): Observable<Authentication> {
+    const sessionTimer = timer(30 * 60000); // 30 minutes
+    const sessionExpiryTimer = of(this.expiresAt).pipe(
+      switchMap(expiresAt => timer(Math.max(1, +expiresAt - Date.now() - 1000)))
+    );
+
+    return race(sessionTimer, sessionExpiryTimer).pipe(switchMap(() => this.renewAuthentication()));
+  }
+
   clearLocalStorage(): void {
     this.accessToken = null;
     this.idToken = null;
@@ -81,15 +93,6 @@ export class AuthProviderService {
       accessToken: this.accessToken,
       redirectUrl: this.redirectUrl
     };
-  }
-
-  scheduleRenewal(): Observable<Authentication> {
-    const sessionTimer = timer(30 * 60000); // 30 minutes
-    const sessionExpiryTimer = of(this.expiresAt).pipe(
-      switchMap(expiresAt => timer(Math.max(1, +expiresAt - Date.now() - 1000)))
-    );
-
-    return race(sessionTimer, sessionExpiryTimer).pipe(switchMap(() => this.renewAuthentication()));
   }
 
   private authorisationCallback(
