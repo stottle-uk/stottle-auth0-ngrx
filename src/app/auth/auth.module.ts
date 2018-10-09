@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import { ModuleWithProviders, NgModule } from '@angular/core';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import * as auth0 from 'auth0-js';
@@ -11,14 +11,8 @@ import { AUTH0_WEB_AUTH } from './services/tokens';
 import * as fromAuth from './store';
 import { AuthEffects } from './store/auth.effects';
 
-export function auth0WebAuthFactory(): auth0.WebAuth {
-  return new auth0.WebAuth({
-    clientID: 'gc3YpcUt64cC655TKbfiv9Pimon2c9V2',
-    domain: 'stottle.eu.auth0.com',
-    responseType: 'token id_token',
-    redirectUri: 'http://localhost:4200/callback',
-    scope: 'openid'
-  });
+export function auth0WebAuthFactory(options: auth0.AuthOptions): () => auth0.WebAuth {
+  return () => new auth0.WebAuth(options);
 }
 
 @NgModule({
@@ -28,14 +22,20 @@ export function auth0WebAuthFactory(): auth0.WebAuth {
     EffectsModule.forFeature([AuthEffects]),
     AuthRoutesModule
   ],
-  declarations: [CallbackComponent],
-  providers: [
-    {
-      provide: AUTH0_WEB_AUTH,
-      useFactory: auth0WebAuthFactory
-    },
-    AuthProviderService,
-    AuthGuardService
-  ]
+  declarations: [CallbackComponent]
 })
-export class AuthModule {}
+export class AuthModule {
+  static forRoot(options: auth0.AuthOptions): ModuleWithProviders {
+    return {
+      ngModule: AuthModule,
+      providers: [
+        {
+          provide: AUTH0_WEB_AUTH,
+          useFactory: auth0WebAuthFactory(options)
+        },
+        AuthProviderService,
+        AuthGuardService
+      ]
+    };
+  }
+}
