@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import * as auth0 from 'auth0-js';
 import { Observable, of, race, Subscriber, timer } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { Authentication } from '../store/auth.model';
 import { AUTH0_WEB_AUTH } from './tokens';
 
@@ -60,13 +60,13 @@ export class AuthProviderService {
   handleAuthentication(): Observable<Authentication> {
     return new Observable<auth0.Auth0DecodedHash>(observer =>
       this.auth0.parseHash(this.authorisationCallback(observer))
-    ).pipe(map(authResult => this.authorizationHandler(authResult)));
+    ).pipe(this.authorizationHandler());
   }
 
   renewAuthentication(): Observable<Authentication> {
     return new Observable<auth0.Auth0DecodedHash>(observer =>
       this.auth0.checkSession({}, this.authorisationCallback(observer))
-    ).pipe(map(authResult => this.authorizationHandler(authResult)));
+    ).pipe(this.authorizationHandler());
   }
 
   clearLocalStorage(): void {
@@ -105,14 +105,22 @@ export class AuthProviderService {
     };
   }
 
-  private authorizationHandler(authResult: auth0.Auth0DecodedHash): Authentication {
-    const clientAuthResult: Authentication = {
+  private authorizationHandler(): (
+    source: Observable<auth0.Auth0DecodedHash>
+  ) => Observable<Authentication> {
+    return source =>
+      source.pipe(
+        map(authResult => this.mapAuthenticationResult(authResult)),
+        tap(mappedAuthResult => this.setSession(mappedAuthResult))
+      );
+  }
+
+  private mapAuthenticationResult(authResult: auth0.Auth0DecodedHash): Authentication {
+    return {
       ...authResult,
       expiresAt: JSON.stringify(new Date().getTime() + 15000), // JSON.stringify(authResult.expiresIn * 1000 + new Date().getTime()),
       redirectUrl: this.redirectUrl
     };
-    this.setSession(clientAuthResult);
-    return clientAuthResult;
   }
 
   private setSession(authResult: Authentication): void {
