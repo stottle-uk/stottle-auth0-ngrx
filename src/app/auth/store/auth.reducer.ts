@@ -4,12 +4,14 @@ import { Authentication } from './auth.model';
 export interface State {
   auth: Authentication;
   userInfo: auth0.Auth0UserProfile;
+  changePasswordResponse: string;
   error: auth0.Auth0Error;
 }
 
 export const initialState: State = {
   auth: null,
   userInfo: null,
+  changePasswordResponse: null,
   error: null
 };
 
@@ -35,6 +37,20 @@ export function reducer(state = initialState, action: AuthActions): State {
       };
     }
 
+    case AuthActionTypes.ChangePasswordStart: {
+      return {
+        ...state,
+        changePasswordResponse: null
+      };
+    }
+
+    case AuthActionTypes.ChangePasswordSuccess: {
+      return {
+        ...state,
+        changePasswordResponse: action.payload.response
+      };
+    }
+
     case AuthActionTypes.GetUserInfoFailure:
     case AuthActionTypes.ChangePasswordFailure:
     case AuthActionTypes.HandleAuthenticationError: {
@@ -51,4 +67,5 @@ export function reducer(state = initialState, action: AuthActions): State {
 
 export const getAuth = (state: State) => state.auth;
 export const getUserInfo = (state: State) => state.userInfo;
+export const getChangePasswordResponse = (state: State) => state.changePasswordResponse;
 export const getError = (state: State) => state.error;

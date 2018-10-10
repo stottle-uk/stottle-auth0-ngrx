@@ -70,6 +70,8 @@ export class ChangePasswordStart implements Action {
 
 export class ChangePasswordSuccess implements Action {
   readonly type = AuthActionTypes.ChangePasswordSuccess;
+
+  constructor(public payload: { response: string }) {}
 }
 
 export class ChangePasswordFailure implements Action {

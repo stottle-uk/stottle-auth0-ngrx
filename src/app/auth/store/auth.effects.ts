@@ -12,6 +12,12 @@ export class AuthEffects {
   constructor(private actions$: Actions, private auth: AuthProviderService) {}
 
   @Effect()
+  setupAuthentication$: Observable<Action> = this.actions$.pipe(
+    take(1),
+    map(() => new fromActions.CheckAuthenticationStatus())
+  );
+
+  @Effect()
   handleAuthentication$: Observable<Action> = this.actions$.pipe(
     take(1),
     exhaustMap(() =>
@@ -25,12 +31,6 @@ export class AuthEffects {
         catchError(error => of(new fromActions.HandleAuthenticationError({ error })))
       )
     )
-  );
-
-  @Effect()
-  setupAuthentication$: Observable<Action> = this.actions$.pipe(
-    take(1),
-    map(() => new fromActions.CheckAuthenticationStatus())
   );
 
   @Effect()
@@ -67,7 +67,7 @@ export class AuthEffects {
   login$: Observable<void> = this.actions$.pipe(
     ofType<fromActions.Login>(fromActions.AuthActionTypes.Login),
     map(action => action.payload.options),
-    map(options => this.auth.login(options))
+    map(options => this.auth.authorize(options))
   );
 
   @Effect({ dispatch: false })
@@ -101,7 +101,12 @@ export class AuthEffects {
     map(action => action.payload.options),
     switchMap(options =>
       this.auth.changePassword(options).pipe(
-        map(() => new fromActions.ChangePasswordSuccess()),
+        map(
+          response =>
+            new fromActions.ChangePasswordSuccess({
+              response
+            })
+        ),
         catchError(error => of(new fromActions.ChangePasswordFailure({ error })))
       )
     )

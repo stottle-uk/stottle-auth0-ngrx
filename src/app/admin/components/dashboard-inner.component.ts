@@ -1,19 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'stottle-dashboard-inner',
   template: `
-    <p>
-      dashboard-inner works!
-    </p>
+  <h1>Admin</h1>
+  <pre>{{userInfo | json}}</pre>
+
+  <input type="email" placeholder="email address" [(ngModel)]="emailAddress" name="emailAddress"/>
+  <button type="button" (click)="submitEmailAddress()">Password Change</button>
+  <p>{{changePasswordResponse}}</p>
   `,
   styles: []
 })
-export class DashboardInnerComponent implements OnInit {
+export class DashboardInnerComponent {
+  @Input()
+  userInfo: auth0.Auth0UserProfile;
+  @Input()
+  changePasswordResponse: string;
+  @Output()
+  emailAddressSubmitted = new EventEmitter<string>();
 
-  constructor() { }
+  emailAddress: string;
 
-  ngOnInit() {
+  submitEmailAddress(): void {
+    this.emailAddressSubmitted.emit(this.emailAddress);
   }
-
 }

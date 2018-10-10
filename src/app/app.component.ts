@@ -7,7 +7,7 @@ import * as fromAuth from './auth/store';
   template: `
   <div style="text-align:center">
     <h1>
-      Welcome to {{title}}!
+      {{title}}
     </h1>
     <button type="button" (click)="login()" *ngIf="!(isAuthenticated$ | async)">login</button>
     <button type="button" (click)="logout()" *ngIf="(isAuthenticated$ | async)">logout</button>

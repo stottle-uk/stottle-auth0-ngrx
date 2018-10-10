@@ -49,7 +49,7 @@ export class AuthProviderService {
     @Inject(AUTH0_LOGOUT_OPTIONS) private logoutOptions: auth0.LogoutOptions
   ) {}
 
-  login(options: auth0.AuthorizeOptions): void {
+  authorize(options: auth0.AuthorizeOptions): void {
     this.auth0.authorize(options);
   }
 
@@ -72,10 +72,10 @@ export class AuthProviderService {
     ).pipe(this.authorizationHandler());
   }
 
-  changePassword(options: auth0.ChangePasswordOptions): Observable<Authentication> {
-    return new Observable<auth0.Auth0DecodedHash>(observer =>
-      this.auth0.changePassword(options, this.authorisationCallback(observer))
-    ).pipe(this.authorizationHandler());
+  changePassword(options: auth0.ChangePasswordOptions): Observable<string> {
+    return new Observable<string>(observer =>
+      this.auth0.changePassword(options, this.changePasswordCallback(observer))
+    );
   }
 
   getUserInfo(): Observable<auth0.Auth0UserProfile> {
@@ -113,6 +113,17 @@ export class AuthProviderService {
     return (err, authResult: auth0.Auth0DecodedHash) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         observer.next(authResult);
+        observer.complete();
+      } else if (err) {
+        observer.error(err);
+      }
+    };
+  }
+
+  private changePasswordCallback(observer: Subscriber<string>): auth0.Auth0Callback<string> {
+    return (err, response: string) => {
+      if (response) {
+        observer.next(response);
         observer.complete();
       } else if (err) {
         observer.error(err);
