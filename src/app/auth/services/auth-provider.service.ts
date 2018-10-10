@@ -62,25 +62,25 @@ export class AuthProviderService {
 
   handleAuthentication(): Observable<Authentication> {
     return new Observable<auth0.Auth0DecodedHash>(observer =>
-      this.auth0.parseHash(this.authorisationCallback(observer))
+      this.auth0.parseHash(this.callback(observer, this.checkAuthResult))
     ).pipe(this.authorizationHandler());
   }
 
   checkSession(): Observable<Authentication> {
     return new Observable<auth0.Auth0DecodedHash>(observer =>
-      this.auth0.checkSession({}, this.authorisationCallback(observer))
+      this.auth0.checkSession({}, this.callback(observer, this.checkAuthResult))
     ).pipe(this.authorizationHandler());
   }
 
   changePassword(options: auth0.ChangePasswordOptions): Observable<string> {
     return new Observable<string>(observer =>
-      this.auth0.changePassword(options, this.changePasswordCallback(observer))
+      this.auth0.changePassword(options, this.callback(observer, result => !!result))
     );
   }
 
   getUserInfo(): Observable<auth0.Auth0UserProfile> {
     return new Observable<auth0.Auth0UserProfile>(observer =>
-      this.auth0.client.userInfo(this.accessToken, this.userInfoCallback(observer))
+      this.auth0.client.userInfo(this.accessToken, this.callback(observer, result => !!result))
     );
   }
 
@@ -107,12 +107,13 @@ export class AuthProviderService {
     };
   }
 
-  private authorisationCallback(
-    observer: Subscriber<auth0.Auth0DecodedHash>
-  ): auth0.Auth0Callback<auth0.Auth0DecodedHash> {
-    return (err, authResult: auth0.Auth0DecodedHash) => {
-      if (authResult && authResult.accessToken && authResult.idToken) {
-        observer.next(authResult);
+  private callback<T>(
+    observer: Subscriber<T>,
+    predicate: (result: T) => boolean
+  ): auth0.Auth0Callback<T> {
+    return (err, result: T) => {
+      if (predicate(result)) {
+        observer.next(result);
         observer.complete();
       } else if (err) {
         observer.error(err);
@@ -120,28 +121,8 @@ export class AuthProviderService {
     };
   }
 
-  private changePasswordCallback(observer: Subscriber<string>): auth0.Auth0Callback<string> {
-    return (err, response: string) => {
-      if (response) {
-        observer.next(response);
-        observer.complete();
-      } else if (err) {
-        observer.error(err);
-      }
-    };
-  }
-
-  private userInfoCallback(
-    observer: Subscriber<auth0.Auth0UserProfile>
-  ): auth0.Auth0Callback<auth0.Auth0UserProfile> {
-    return (err, userInfo: auth0.Auth0UserProfile) => {
-      if (userInfo) {
-        observer.next(userInfo);
-        observer.complete();
-      } else if (err) {
-        observer.error(err);
-      }
-    };
+  private checkAuthResult(result: auth0.Auth0DecodedHash): boolean {
+    return !!result && !!result.accessToken && !!result.idToken;
   }
 
   private authorizationHandler(): (
