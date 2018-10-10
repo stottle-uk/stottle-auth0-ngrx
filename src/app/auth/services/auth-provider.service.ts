@@ -7,10 +7,10 @@ import { AUTH0_LOGOUT_OPTIONS, AUTH0_WEB_AUTH } from './tokens';
 
 @Injectable()
 export class AuthProviderService {
-  ACCESS_TOKEN = 'access_token';
-  ID_TOKEN = 'id_token';
-  EXPIRES_AT = 'expires_at';
-  REDIRECT_URL = 'redirect_url';
+  ACCESS_TOKEN = 'stottle::access_token';
+  ID_TOKEN = 'stottle::id_token';
+  EXPIRES_AT = 'stottle::expires_at';
+  REDIRECT_URL = 'stottle::redirect_url';
 
   get accessToken(): string {
     return localStorage.getItem(this.ACCESS_TOKEN);
@@ -138,12 +138,12 @@ export class AuthProviderService {
   ) => Observable<Authentication> {
     return source =>
       source.pipe(
-        map(authResult => this.mapAuthenticationResult(authResult)),
+        map(authResult => this.mapToAuthemticationState(authResult)),
         tap(mappedAuthResult => this.setSession(mappedAuthResult))
       );
   }
 
-  private mapAuthenticationResult(authResult: auth0.Auth0DecodedHash): Authentication {
+  private mapToAuthemticationState(authResult: auth0.Auth0DecodedHash): Authentication {
     return {
       ...authResult,
       expiresAt: JSON.stringify(new Date().getTime() + 15000), // JSON.stringify(authResult.expiresIn * 1000 + new Date().getTime()),
