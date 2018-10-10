@@ -3,11 +3,13 @@ import { Authentication } from './auth.model';
 
 export interface State {
   auth: Authentication;
+  userInfo: auth0.Auth0UserProfile;
   error: auth0.Auth0Error;
 }
 
 export const initialState: State = {
   auth: null,
+  userInfo: null,
   error: null
 };
 
@@ -26,6 +28,15 @@ export function reducer(state = initialState, action: AuthActions): State {
       };
     }
 
+    case AuthActionTypes.GetUserInfoSuccess: {
+      return {
+        ...state,
+        userInfo: action.payload.userInfo
+      };
+    }
+
+    case AuthActionTypes.GetUserInfoFailure:
+    case AuthActionTypes.ChangePasswordFailure:
     case AuthActionTypes.HandleAuthenticationError: {
       return {
         ...state,
@@ -39,4 +50,5 @@ export function reducer(state = initialState, action: AuthActions): State {
 }
 
 export const getAuth = (state: State) => state.auth;
+export const getUserInfo = (state: State) => state.userInfo;
 export const getError = (state: State) => state.error;

@@ -78,6 +78,12 @@ export class AuthProviderService {
     ).pipe(this.authorizationHandler());
   }
 
+  getUserInfo(): Observable<auth0.Auth0UserProfile> {
+    return new Observable<auth0.Auth0UserProfile>(observer =>
+      this.auth0.client.userInfo(this.accessToken, this.userInfoCallback(observer))
+    );
+  }
+
   scheduleRenewal(): Observable<Authentication> {
     const sessionTimer = timer(30 * 60000); // 30 minutes
     const sessionExpiryTimer = of(this.expiresAt).pipe(
@@ -107,6 +113,19 @@ export class AuthProviderService {
     return (err, authResult: auth0.Auth0DecodedHash) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
         observer.next(authResult);
+        observer.complete();
+      } else if (err) {
+        observer.error(err);
+      }
+    };
+  }
+
+  private userInfoCallback(
+    observer: Subscriber<auth0.Auth0UserProfile>
+  ): auth0.Auth0Callback<auth0.Auth0UserProfile> {
+    return (err, userInfo: auth0.Auth0UserProfile) => {
+      if (userInfo) {
+        observer.next(userInfo);
         observer.complete();
       } else if (err) {
         observer.error(err);
