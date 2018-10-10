@@ -146,7 +146,7 @@ export class AuthProviderService {
   private mapToAuthemticationState(authResult: auth0.Auth0DecodedHash): Authentication {
     return {
       ...authResult,
-      expiresAt: JSON.stringify(new Date().getTime() + 15000), // JSON.stringify(authResult.expiresIn * 1000 + new Date().getTime()),
+      expiresAt: JSON.stringify(authResult.expiresIn * 1000 + new Date().getTime()),
       redirectUrl: this.redirectUrl
     };
   }
