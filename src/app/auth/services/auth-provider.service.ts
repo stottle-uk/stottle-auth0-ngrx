@@ -66,7 +66,7 @@ export class AuthProviderService {
     ).pipe(this.authorizationHandler());
   }
 
-  renewAuthentication(): Observable<Authentication> {
+  checkSession(): Observable<Authentication> {
     return new Observable<auth0.Auth0DecodedHash>(observer =>
       this.auth0.checkSession({}, this.authorisationCallback(observer))
     ).pipe(this.authorizationHandler());
@@ -84,13 +84,13 @@ export class AuthProviderService {
     );
   }
 
-  scheduleRenewal(): Observable<Authentication> {
+  scheduleSessionCheck(): Observable<number> {
     const sessionTimer = timer(30 * 60000); // 30 minutes
     const sessionExpiryTimer = of(this.expiresAt).pipe(
       switchMap(expiresAt => timer(Math.max(1, +expiresAt - Date.now() - 1000)))
     );
 
-    return race(sessionTimer, sessionExpiryTimer).pipe(switchMap(() => this.renewAuthentication()));
+    return race(sessionTimer, sessionExpiryTimer);
   }
 
   clearLocalStorage(): void {

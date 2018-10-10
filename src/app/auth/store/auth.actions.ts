@@ -16,10 +16,10 @@ export enum AuthActionTypes {
   ClearLocalStorage = '[Auth] Clear Local Storage',
   HandleAuthentication = '[Auth] Handle Authentication',
   HandleAuthenticationError = '[Auth] Handle Authentication Error',
-  RenewSessionStart = '[Auth] Renew Session Start',
-  RenewSessionSuccess = '[Auth] Renew Session Success',
-  RenewSessionFailure = '[Auth] Renew Session Failure',
-  ScheduleSessionRenewal = '[Auth] Schedule Session Renewal'
+  CheckSessionStart = '[Auth] Check Session Start',
+  CheckSessionSuccess = '[Auth] Check Session Success',
+  CheckSessionFailure = '[Auth] Check Session Failure',
+  ScheduleSessionCheck = '[Auth] Schedule Session Check'
 }
 
 export class CheckAuthenticationStatus implements Action {
@@ -96,22 +96,24 @@ export class HandleAuthenticationError implements Action {
   constructor(public payload: { error: auth0.Auth0Error }) {}
 }
 
-export class RenewSessionStart implements Action {
-  readonly type = AuthActionTypes.RenewSessionStart;
+export class CheckSessionStart implements Action {
+  readonly type = AuthActionTypes.CheckSessionStart;
 }
 
-export class RenewSessionSuccess implements Action {
-  readonly type = AuthActionTypes.RenewSessionSuccess;
+export class CheckSessionSuccess implements Action {
+  readonly type = AuthActionTypes.CheckSessionSuccess;
+
+  constructor(public payload: { auth: Authentication }) {}
 }
 
-export class RenewSessionFailure implements Action {
-  readonly type = AuthActionTypes.RenewSessionFailure;
+export class CheckSessionFailure implements Action {
+  readonly type = AuthActionTypes.CheckSessionFailure;
 
   constructor(public payload: { error: any }) {}
 }
 
-export class ScheduleSessionRenewal implements Action {
-  readonly type = AuthActionTypes.ScheduleSessionRenewal;
+export class ScheduleSessionCheck implements Action {
+  readonly type = AuthActionTypes.ScheduleSessionCheck;
 }
 
 export type AuthActions =
@@ -127,7 +129,7 @@ export type AuthActions =
   | ClearLocalStorage
   | HandleAuthentication
   | HandleAuthenticationError
-  | RenewSessionStart
-  | RenewSessionSuccess
-  | RenewSessionFailure
-  | ScheduleSessionRenewal;
+  | CheckSessionStart
+  | CheckSessionSuccess
+  | CheckSessionFailure
+  | ScheduleSessionCheck;

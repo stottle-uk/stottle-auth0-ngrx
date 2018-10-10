@@ -138,35 +138,38 @@ export class AuthEffects {
   @Effect()
   handleAuthenticationScheduleRenewal$: Observable<Action> = this.actions$.pipe(
     ofType<fromActions.HandleAuthentication>(fromActions.AuthActionTypes.HandleAuthentication),
-    map(() => new fromActions.ScheduleSessionRenewal())
-  );
-
-  @Effect()
-  renewSessionStart$: Observable<Action> = this.actions$.pipe(
-    ofType<fromActions.RenewSessionStart>(fromActions.AuthActionTypes.RenewSessionStart),
-    switchMap(() =>
-      this.auth.renewAuthentication().pipe(
-        map(() => new fromActions.RenewSessionSuccess()),
-        catchError(error => of(new fromActions.RenewSessionFailure({ error })))
-      )
-    )
+    map(() => new fromActions.ScheduleSessionCheck())
   );
 
   @Effect()
   scheduleSessionRenewal$: Observable<Action> = this.actions$.pipe(
-    ofType<fromActions.ScheduleSessionRenewal>(fromActions.AuthActionTypes.ScheduleSessionRenewal),
+    ofType<fromActions.ScheduleSessionCheck>(fromActions.AuthActionTypes.ScheduleSessionCheck),
     switchMap(() =>
-      this.auth.scheduleRenewal().pipe(
-        map(() => new fromActions.RenewSessionSuccess()),
-        catchError(error => of(new fromActions.RenewSessionFailure({ error })))
+      this.auth.scheduleSessionCheck().pipe(map(() => new fromActions.CheckSessionStart()))
+    )
+  );
+
+  @Effect()
+  renewSessionStart$: Observable<Action> = this.actions$.pipe(
+    ofType<fromActions.CheckSessionStart>(fromActions.AuthActionTypes.CheckSessionStart),
+    switchMap(() =>
+      this.auth.checkSession().pipe(
+        map(auth => new fromActions.CheckSessionSuccess({ auth })),
+        catchError(error => of(new fromActions.CheckSessionFailure({ error })))
       )
     )
   );
 
   @Effect()
-  renewSessionSuccess$: Observable<Action> = this.actions$.pipe(
-    ofType<fromActions.RenewSessionSuccess>(fromActions.AuthActionTypes.RenewSessionSuccess),
-    map(() => new fromActions.ScheduleSessionRenewal())
+  renewSessionSuccessScheduleRenewal$: Observable<Action> = this.actions$.pipe(
+    ofType<fromActions.CheckSessionSuccess>(fromActions.AuthActionTypes.CheckSessionSuccess),
+    map(action => action.payload.auth),
+    map(
+      auth =>
+        new fromActions.UserIsAuthenticated({
+          auth
+        })
+    )
   );
 
   // User is not authenticated
