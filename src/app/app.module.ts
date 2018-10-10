@@ -20,7 +20,8 @@ import { RouterClientModule } from './router-client/router-client.module';
         domain: 'stottle.eu.auth0.com',
         responseType: 'token id_token',
         redirectUri: 'http://localhost:4200/callback',
-        scope: 'openid'
+        scope: 'openid profile email',
+        audience: 'http://localhost:8004'
       },
       {
         returnTo: 'http://localhost:4200'
