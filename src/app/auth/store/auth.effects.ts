@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
-import { EMPTY, Observable, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { catchError, exhaustMap, filter, map, switchMap, take, tap } from 'rxjs/operators';
 import * as fromRouter from '../../router-client/store';
 import { AuthProviderService } from '../services/auth-provider.service';
@@ -71,11 +71,10 @@ export class AuthEffects {
   );
 
   @Effect({ dispatch: false })
-  loginSaveRedirectUrl$: Observable<void> = this.actions$.pipe(
+  loginSaveRedirectUrl$: Observable<string> = this.actions$.pipe(
     ofType<fromActions.Login>(fromActions.AuthActionTypes.Login),
     map(action => action.payload.redirectUrl),
-    tap(redirectUrl => (this.auth.redirectUrl = redirectUrl)),
-    switchMap(() => EMPTY)
+    tap(redirectUrl => (this.auth.redirectUrl = redirectUrl))
   );
 
   @Effect({ dispatch: false })
