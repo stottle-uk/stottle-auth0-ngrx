@@ -4,7 +4,10 @@ import { Authentication } from './auth.model';
 export enum AuthActionTypes {
   SetupAuthentication = '[Auth] Setup Authentication',
   Login = '[Auth] Login',
-  Logout = '[Auth] Logout',
+  Logout = '[Auth] Logout Start',
+  ChangePasswordStart = '[AUth] Change Passwod Start',
+  ChangePasswordSuccess = '[AUth] Change Passwod Sucess',
+  ChangePasswordFailure = '[AUth] Change Passwod Failure',
   ClearLocalStorage = '[Auth] Clear Local Storage',
   HandleAuthentication = '[Auth] Handle Authentication',
   HandleAuthenticationError = '[Auth] Handle Authentication Error',
@@ -26,6 +29,22 @@ export class Login implements Action {
 
 export class Logout implements Action {
   readonly type = AuthActionTypes.Logout;
+}
+
+export class ChangePasswordStart implements Action {
+  readonly type = AuthActionTypes.ChangePasswordStart;
+
+  constructor(public payload: { options: auth0.ChangePasswordOptions }) {}
+}
+
+export class ChangePasswordSuccess implements Action {
+  readonly type = AuthActionTypes.ChangePasswordSuccess;
+}
+
+export class ChangePasswordFailure implements Action {
+  readonly type = AuthActionTypes.ChangePasswordFailure;
+
+  constructor(public payload: { error: any }) {}
 }
 
 export class ClearLocalStorage implements Action {

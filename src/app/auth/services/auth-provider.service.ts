@@ -72,6 +72,12 @@ export class AuthProviderService {
     ).pipe(this.authorizationHandler());
   }
 
+  changePassword(options: auth0.ChangePasswordOptions): Observable<Authentication> {
+    return new Observable<auth0.Auth0DecodedHash>(observer =>
+      this.auth0.changePassword(options, this.authorisationCallback(observer))
+    ).pipe(this.authorizationHandler());
+  }
+
   scheduleRenewal(): Observable<Authentication> {
     const sessionTimer = timer(30 * 60000); // 30 minutes
     const sessionExpiryTimer = of(this.expiresAt).pipe(

@@ -45,6 +45,18 @@ export class AuthEffects {
     map(options => this.auth.login(options))
   );
 
+  @Effect()
+  changePasswordStart$: Observable<Action> = this.actions$.pipe(
+    ofType<fromActions.ChangePasswordStart>(fromActions.AuthActionTypes.ChangePasswordStart),
+    map(action => action.payload.options),
+    switchMap(options =>
+      this.auth.changePassword(options).pipe(
+        map(() => new fromActions.ChangePasswordSuccess()),
+        catchError(error => of(new fromActions.ChangePasswordFailure({ error })))
+      )
+    )
+  );
+
   @Effect({ dispatch: false })
   loginSaveRedirectUrl$: Observable<void> = this.actions$.pipe(
     ofType<fromActions.Login>(fromActions.AuthActionTypes.Login),
