@@ -6,9 +6,7 @@ import { map, mergeMap } from 'rxjs/operators';
 import * as fromAuth from '../store';
 import { Authentication } from '../store/auth.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class AuthIntercepterService {
   constructor(private store: Store<fromAuth.State>) {}
 
