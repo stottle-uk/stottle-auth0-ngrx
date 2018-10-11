@@ -60,6 +60,15 @@ export class AuthProviderService {
     });
   }
 
+  login(): Observable<Authentication> {
+    return new Observable<auth0.Auth0DecodedHash>(observer =>
+      this.auth0.login({
+        email: '',
+        password: ''
+      }, this.callback(observer, this.checkAuthResult))
+    ).pipe(this.authorizationHandler());
+  }
+
   handleAuthentication(): Observable<Authentication> {
     return new Observable<auth0.Auth0DecodedHash>(observer =>
       this.auth0.parseHash(this.callback(observer, this.checkAuthResult))

@@ -1,3 +1,4 @@
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { EffectsModule } from '@ngrx/effects';
@@ -21,13 +22,14 @@ import { RouterClientModule } from './router-client/router-client.module';
         responseType: 'token id_token',
         redirectUri: 'http://localhost:4200/callback',
         scope: 'openid profile email',
-        audience: 'http://localhost:8004'
+        audience: 'https://stottle-auth0-ngrx-api/'
       },
       {
         returnTo: 'http://localhost:4200'
       }
     ),
     RouterClientModule,
+    HttpClientModule,
     StoreModule.forRoot({}),
     EffectsModule.forRoot([]),
     StoreRouterConnectingModule.forRoot({ stateKey: 'router' }),

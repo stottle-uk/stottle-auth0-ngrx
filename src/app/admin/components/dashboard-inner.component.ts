@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'stottle-dashboard-inner',
@@ -12,7 +13,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   `,
   styles: []
 })
-export class DashboardInnerComponent {
+export class DashboardInnerComponent implements OnInit {
   @Input()
   userInfo: auth0.Auth0UserProfile;
   @Input()
@@ -22,7 +23,19 @@ export class DashboardInnerComponent {
 
   emailAddress: string;
 
+  constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.getConfig();
+  }
+
   submitEmailAddress(): void {
     this.emailAddressSubmitted.emit(this.emailAddress);
+  }
+
+  getConfig() {
+    const configUrl = 'https://localhost:44305/api/values';
+
+    return this.http.get(configUrl).subscribe();
   }
 }
