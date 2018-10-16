@@ -1,11 +1,15 @@
-import { TestBed, async } from '@angular/core/testing';
+import { APP_BASE_HREF } from '@angular/common';
+import { async, TestBed } from '@angular/core/testing';
+import { RouterModule } from '@angular/router';
+import { StoreModule } from '@ngrx/store';
 import { AppComponent } from './app.component';
+
 describe('AppComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        AppComponent
-      ],
+      imports: [RouterModule.forRoot([]), StoreModule.forRoot({})],
+      providers: [{ provide: APP_BASE_HREF, useValue: '/' }],
+      declarations: [AppComponent]
     }).compileComponents();
   }));
   it('should create the app', async(() => {
@@ -17,11 +21,5 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
     expect(app.title).toEqual('stottle-auth0-ngrx');
-  }));
-  it('should render title in a h1 tag', async(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('Welcome to stottle-auth0-ngrx!');
   }));
 });

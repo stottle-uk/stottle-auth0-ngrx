@@ -1,17 +1,19 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { DashboardComponent } from './dashboard.component';
+import { FormsModule } from '@angular/forms';
 import { Store, StoreModule } from '@ngrx/store';
+import { DashboardInnerComponent } from '../components/dashboard-inner.component';
+import { DashboardComponent } from './dashboard.component';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
   let store: Store<any>;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [ StoreModule.forRoot({}) ],
-      declarations: [ DashboardComponent ]
+      imports: [HttpClientModule, FormsModule, StoreModule.forRoot({})],
+      declarations: [DashboardComponent, DashboardInnerComponent]
     });
 
     await TestBed.compileComponents();
