@@ -6,6 +6,7 @@ import { StoreModule } from '@ngrx/store';
 import * as auth0 from 'auth0-js';
 import { AuthRoutesModule } from './auth-routes.moduls';
 import { CallbackComponent } from './components/callback.component';
+import { AuthDatesService } from './services/auth-dates.service';
 import { AuthGuardService } from './services/auth-guard.service';
 import { AuthIntercepterService } from './services/auth-intercepter.service';
 import { AuthProviderService } from './services/auth-provider.service';
@@ -47,8 +48,9 @@ export class AuthModule {
           useClass: AuthIntercepterService,
           multi: true
         },
-        AuthProviderService,
-        AuthGuardService
+        AuthDatesService,
+        AuthGuardService,
+        AuthProviderService
       ]
     };
   }

@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideMockActions } from '@ngrx/effects/testing';
 import * as auth0 from 'auth0-js';
 import { Observable } from 'rxjs';
+import { AuthDatesService } from '../services/auth-dates.service';
 import { AuthProviderService } from '../services/auth-provider.service';
 import { AUTH0_LOGOUT_OPTIONS, AUTH0_WEB_AUTH } from '../services/tokens';
 import { AuthEffects } from './auth.effects';
@@ -20,6 +21,7 @@ describe('AuthEffects', () => {
       providers: [
         AuthEffects,
         AuthProviderService,
+        AuthDatesService,
         {
           provide: AUTH0_WEB_AUTH,
           useValue: webAuth

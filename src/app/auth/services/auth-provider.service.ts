@@ -3,6 +3,7 @@ import * as auth0 from 'auth0-js';
 import { Observable, of, race, Subscriber, timer } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 import { Authentication } from '../store/auth.model';
+import { AuthDatesService } from './auth-dates.service';
 import { AUTH0_LOGOUT_OPTIONS, AUTH0_WEB_AUTH } from './tokens';
 
 @Injectable()
@@ -45,6 +46,7 @@ export class AuthProviderService {
   }
 
   constructor(
+    private dateService: AuthDatesService,
     @Inject(AUTH0_WEB_AUTH) private auth0: auth0.WebAuth,
     @Inject(AUTH0_LOGOUT_OPTIONS) private logoutOptions: auth0.LogoutOptions
   ) {}
@@ -62,10 +64,13 @@ export class AuthProviderService {
 
   login(): Observable<Authentication> {
     return new Observable<auth0.Auth0DecodedHash>(observer =>
-      this.auth0.login({
-        email: '',
-        password: ''
-      }, this.callback(observer, this.checkAuthResult))
+      this.auth0.login(
+        {
+          email: '',
+          password: ''
+        },
+        this.callback(observer, this.checkAuthResult)
+      )
     ).pipe(this.authorizationHandler());
   }
 
@@ -83,20 +88,28 @@ export class AuthProviderService {
 
   changePassword(options: auth0.ChangePasswordOptions): Observable<string> {
     return new Observable<string>(observer =>
-      this.auth0.changePassword(options, this.callback(observer, result => !!result))
+      this.auth0.changePassword(
+        options,
+        this.callback(observer, result => !!result)
+      )
     );
   }
 
   getUserInfo(): Observable<auth0.Auth0UserProfile> {
     return new Observable<auth0.Auth0UserProfile>(observer =>
-      this.auth0.client.userInfo(this.accessToken, this.callback(observer, result => !!result))
+      this.auth0.client.userInfo(
+        this.accessToken,
+        this.callback(observer, result => !!result)
+      )
     );
   }
 
   scheduleSessionCheck(): Observable<number> {
     const sessionTimer = timer(30 * 60000); // 30 minutes
     const sessionExpiryTimer = of(this.expiresAt).pipe(
-      switchMap(expiresAt => timer(Math.max(1, +expiresAt - Date.now() - 1000)))
+      switchMap(expiresAt =>
+        timer(Math.max(1, +expiresAt - this.dateService.getTime() - 1000))
+      )
     );
 
     return race(sessionTimer, sessionExpiryTimer);
@@ -120,14 +133,10 @@ export class AuthProviderService {
     observer: Subscriber<T>,
     predicate: (result: T) => boolean
   ): auth0.Auth0Callback<T> {
-    return (err, result: T) => {
-      if (predicate(result)) {
-        observer.next(result);
-        observer.complete();
-      } else if (err) {
-        observer.error(err);
-      }
-    };
+    return (err, result: T) =>
+      predicate(result)
+        ? (observer.next(result), observer.complete())
+        : observer.error(err);
   }
 
   private checkAuthResult(result: auth0.Auth0DecodedHash): boolean {
@@ -144,10 +153,14 @@ export class AuthProviderService {
       );
   }
 
-  private mapToAuthemticationState(authResult: auth0.Auth0DecodedHash): Authentication {
+  private mapToAuthemticationState(
+    authResult: auth0.Auth0DecodedHash
+  ): Authentication {
     return {
       ...authResult,
-      expiresAt: JSON.stringify(authResult.expiresIn * 1000 + new Date().getTime()),
+      expiresAt: JSON.stringify(
+        authResult.expiresIn * 1000 + this.dateService.getTime()
+      ),
       redirectUrl: this.redirectUrl
     };
   }
