@@ -63,7 +63,6 @@ fdescribe('AuthProviderService', () => {
     );
 
     service.handleAuthentication().subscribe(value => {
-      expect(authProvider.parseHash).toHaveBeenCalled();
       expect(value.accessToken).toBe('accessToken');
       expect(value.idToken).toBe('idToken');
       expect(value.expiresAt).toBe('2000');
@@ -80,7 +79,6 @@ fdescribe('AuthProviderService', () => {
     );
 
     service.checkSession().subscribe(value => {
-      expect(authProvider.checkSession).toHaveBeenCalled();
       expect(value.accessToken).toBe('accessToken');
       expect(value.idToken).toBe('idToken');
       expect(value.expiresAt).toBe('2000');
@@ -98,8 +96,21 @@ fdescribe('AuthProviderService', () => {
         email: 'emai@test.com'
       })
       .subscribe(value => {
-        expect(authProvider.changePassword).toHaveBeenCalled();
         expect(value).toBe('password change requested');
       });
+  });
+
+  it('should get user info', () => {
+    authProvider.client.userInfo = jasmine
+      .createSpy('userInfo')
+      .and.callFake((accessToken, callback) =>
+        callback('error', {
+          name: 'name'
+        })
+      );
+
+    service.getUserInfo().subscribe(value => {
+      expect(value.name).toBe('name');
+    });
   });
 });
