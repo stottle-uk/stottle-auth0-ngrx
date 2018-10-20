@@ -88,28 +88,20 @@ export class AuthProviderService {
 
   changePassword(options: auth0.ChangePasswordOptions): Observable<string> {
     return new Observable<string>(observer =>
-      this.auth0.changePassword(
-        options,
-        this.callback(observer, result => !!result)
-      )
+      this.auth0.changePassword(options, this.callback(observer, result => !!result))
     );
   }
 
   getUserInfo(): Observable<auth0.Auth0UserProfile> {
     return new Observable<auth0.Auth0UserProfile>(observer =>
-      this.auth0.client.userInfo(
-        this.accessToken,
-        this.callback(observer, result => !!result)
-      )
+      this.auth0.client.userInfo(this.accessToken, this.callback(observer, result => !!result))
     );
   }
 
   scheduleSessionCheck(): Observable<number> {
     const sessionTimer = timer(30 * 60000); // 30 minutes
     const sessionExpiryTimer = of(this.expiresAt).pipe(
-      switchMap(expiresAt =>
-        timer(Math.max(1, +expiresAt - this.dateService.getTime() - 1000))
-      )
+      switchMap(expiresAt => timer(Math.max(1, +expiresAt - this.dateService.getTime() - 1000)))
     );
 
     return race(sessionTimer, sessionExpiryTimer);
@@ -134,9 +126,7 @@ export class AuthProviderService {
     predicate: (result: T) => boolean
   ): auth0.Auth0Callback<T> {
     return (err, result: T) =>
-      predicate(result)
-        ? (observer.next(result), observer.complete())
-        : observer.error(err);
+      predicate(result) ? (observer.next(result), observer.complete()) : observer.error(err);
   }
 
   private checkAuthResult(result: auth0.Auth0DecodedHash): boolean {
@@ -153,14 +143,10 @@ export class AuthProviderService {
       );
   }
 
-  private mapToAuthemticationState(
-    authResult: auth0.Auth0DecodedHash
-  ): Authentication {
+  private mapToAuthemticationState(authResult: auth0.Auth0DecodedHash): Authentication {
     return {
       ...authResult,
-      expiresAt: JSON.stringify(
-        authResult.expiresIn * 1000 + this.dateService.getTime()
-      ),
+      expiresAt: authResult.expiresIn * 1000 + this.dateService.getTime(),
       redirectUrl: this.redirectUrl
     };
   }
@@ -168,7 +154,7 @@ export class AuthProviderService {
   private setSession(authResult: Authentication): void {
     this.accessToken = authResult.accessToken;
     this.idToken = authResult.idToken;
-    this.expiresAt = authResult.expiresAt;
+    this.expiresAt = authResult.expiresAt.toString();
   }
 
   private addOrRemoveFromLocalStorage(key: string, value: string) {

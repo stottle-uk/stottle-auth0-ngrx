@@ -65,7 +65,7 @@ fdescribe('AuthProviderService', () => {
     service.handleAuthentication().subscribe(value => {
       expect(value.accessToken).toBe('accessToken');
       expect(value.idToken).toBe('idToken');
-      expect(value.expiresAt).toBe('2000');
+      expect(value.expiresAt).toBe(2000);
     });
   });
 
@@ -81,7 +81,7 @@ fdescribe('AuthProviderService', () => {
     service.checkSession().subscribe(value => {
       expect(value.accessToken).toBe('accessToken');
       expect(value.idToken).toBe('idToken');
-      expect(value.expiresAt).toBe('2000');
+      expect(value.expiresAt).toBe(2000);
     });
   });
 
@@ -112,5 +112,31 @@ fdescribe('AuthProviderService', () => {
     service.getUserInfo().subscribe(value => {
       expect(value.name).toBe('name');
     });
+  });
+
+  it('should schedule Session Check', () => {
+    service.scheduleSessionCheck().subscribe(value => {
+      expect(value).toBe(0);
+    });
+  });
+
+  it('should clear local storage', () => {
+    service.accessToken = 'accessToken';
+    service.idToken = 'idToken';
+    service.expiresAt = '200';
+    service.clearLocalStorage();
+    expect(service.accessToken).toBeNull();
+    expect(service.idToken).toBeNull();
+    expect(service.expiresAt).toBeNull();
+  });
+
+  it('should get session state from local stroage', () => {
+    service.expiresAt = '200';
+    service.accessToken = 'accessToken';
+    service.redirectUrl = 'redirectUrl';
+    const result = service.getAuthState();
+    expect(result.expiresAt).toBe(200);
+    expect(result.accessToken).toBe('accessToken');
+    expect(result.redirectUrl).toBe('redirectUrl');
   });
 });

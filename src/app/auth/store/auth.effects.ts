@@ -43,7 +43,7 @@ export class AuthEffects {
       authState =>
         !!authState.accessToken &&
         !!authState.expiresAt &&
-        new Date().getTime() < +authState.expiresAt
+        new Date().getTime() < authState.expiresAt
           ? new fromActions.UserIsAuthenticated({
               auth: authState
             })

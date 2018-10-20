@@ -1,4 +1,4 @@
 export interface Authentication extends auth0.Auth0DecodedHash {
-  expiresAt: string;
+  expiresAt: number;
   redirectUrl: string;
 }
