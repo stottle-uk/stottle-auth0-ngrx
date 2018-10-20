@@ -55,7 +55,7 @@ fdescribe('AuthProviderService', () => {
 
   it('should handle Authentication', () => {
     authProvider.parseHash = jasmine.createSpy('parseHash').and.callFake(callback =>
-      callback('error', {
+      callback(null, {
         accessToken: 'accessToken',
         idToken: 'idToken',
         expiresIn: '1'
@@ -69,9 +69,22 @@ fdescribe('AuthProviderService', () => {
     });
   });
 
+  it('should handle Authentication error', () => {
+    authProvider.parseHash = jasmine
+      .createSpy('parseHash')
+      .and.callFake(callback => callback('error', {}));
+
+    service.handleAuthentication().subscribe(
+      value => {},
+      error => {
+        expect(error).toBe('error');
+      }
+    );
+  });
+
   it('should check session', () => {
     authProvider.checkSession = jasmine.createSpy('parseHash').and.callFake((options, callback) =>
-      callback('error', {
+      callback(null, {
         accessToken: 'accessToken',
         idToken: 'idToken',
         expiresIn: '1'
